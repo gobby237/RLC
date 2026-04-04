@@ -280,6 +280,53 @@ void rlc_analysis() {
     calcOmega0(delta_c, s_delta_c, omega0_c, s_omega0_c);
     calcQ(omega0_c, s_omega0_c, delta_c, s_delta_c, Q_c, sQ_c);
 
+        // --------------------------------------------------------
+    // 5d. Calcolo di L e Rtot usando C misurata col Metrix
+    //
+    //  C = (4.76 +- 0.02) nF
+    //
+    //  Formule:
+    //    L = 1 / (omega0^2 * C)
+    //    Rtot = 2 * L * delta
+    //
+    //  Propagazione errori:
+    //    sL/L = sqrt[ (2 s_omega0 / omega0)^2 + (sC / C)^2 ]
+    //
+    //    sR/R = sqrt[ (sL / L)^2 + (s_delta / delta)^2 ]
+    // --------------------------------------------------------
+
+    double C_metrix  = 4.76e-9;   // F
+    double sC_metrix = 0.02e-9;   // F
+
+    auto calcL = [&](double omega0, double s_omega0,
+                     double &L, double &sL) {
+        L  = 1.0 / (omega0 * omega0 * C_metrix);
+        sL = L * TMath::Sqrt(
+                 TMath::Power(2.0 * s_omega0 / omega0, 2) +
+                 TMath::Power(sC_metrix / C_metrix, 2)
+             );
+    };
+
+    auto calcRtot = [&](double L, double sL,
+                        double delta, double s_delta,
+                        double &Rtot, double &sRtot) {
+        Rtot  = 2.0 * L * delta;
+        sRtot = Rtot * TMath::Sqrt(
+                    TMath::Power(sL / L, 2) +
+                    TMath::Power(s_delta / delta, 2)
+                );
+    };
+
+    double L_p, sL_p, L_m, sL_m, L_c, sL_c;
+    calcL(omega0_p, s_omega0_p, L_p, sL_p);
+    calcL(omega0_m, s_omega0_m, L_m, sL_m);
+    calcL(omega0_c, s_omega0_c, L_c, sL_c);
+
+    double Rtot_p, sRtot_p, Rtot_m, sRtot_m, Rtot_c, sRtot_c;
+    calcRtot(L_p, sL_p, delta_p, s_delta_p, Rtot_p, sRtot_p);
+    calcRtot(L_m, sL_m, delta_m, s_delta_m, Rtot_m, sRtot_m);
+    calcRtot(L_c, sL_c, delta_c, s_delta_c, Rtot_c, sRtot_c);
+
     // --------------------------------------------------------
     // 5c. Residui
     // --------------------------------------------------------
@@ -324,6 +371,8 @@ void rlc_analysis() {
     printf("  delta (=1/tau)   = %.4e +/- %.4e  rad/s\n", delta_p,  s_delta_p);
     printf("  omega_0          = %.4e +/- %.4e  rad/s\n", omega0_p, s_omega0_p);
     printf("  Q+               = %.4f +/- %.4f\n\n",      Q_p,      sQ_p);
+    printf("  L+               = %.4e +/- %.4e H\n", L_p, sL_p);
+    printf("  Rtot+            = %.4f +/- %.4f ohm\n\n", Rtot_p, sRtot_p);
 
     printf("  [MINIMI -]   chi2/ndf = %.4f/%d = %.4f,  Prob = %.4f\n",
            chi2m,(int)ndfm,chi2m/ndfm,TMath::Prob(chi2m,ndfm));
@@ -332,6 +381,8 @@ void rlc_analysis() {
     printf("  delta (=1/tau)   = %.4e +/- %.4e  rad/s\n", delta_m,  s_delta_m);
     printf("  omega_0          = %.4e +/- %.4e  rad/s\n", omega0_m, s_omega0_m);
     printf("  Q-               = %.4f +/- %.4f\n\n",      Q_m,      sQ_m);
+    printf("  L-               = %.4e +/- %.4e H\n", L_m, sL_m);
+    printf("  Rtot-            = %.4f +/- %.4f ohm\n\n", Rtot_m, sRtot_m);
 
     printf("  TEST p1+/p1-: pull = %.2f  --> %s\n", pull_p1,
            compatible ? "COMPATIBILI" : "NON compatibili");
@@ -343,6 +394,8 @@ void rlc_analysis() {
     printf("  delta (=1/tau)   = %.4e +/- %.4e  rad/s\n", delta_c,  s_delta_c);
     printf("  omega_0          = %.4e +/- %.4e  rad/s\n", omega0_c, s_omega0_c);
     printf("  Q_comb           = %.4f +/- %.4f\n\n",      Q_c,      sQ_c);
+    printf("  L_comb           = %.4e +/- %.4e H\n", L_c, sL_c);
+    printf("  Rtot_comb        = %.4f +/- %.4f ohm\n\n", Rtot_c, sRtot_c);
 
     // --------------------------------------------------------
     // 7. Canvas 1 - fit separati + residui
