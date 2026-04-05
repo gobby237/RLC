@@ -425,8 +425,8 @@ void rlc_analysis() {
     TPad *pad1_bot = new TPad("pad1_bot", "pad1_bot", 0.0, 0.00, 1.0, 0.19);
 
     pad1_top->SetBottomMargin(0.02); pad1_top->SetLeftMargin(0.12);
-    pad1_top->SetRightMargin(0.05);  pad1_top->SetTopMargin(0.05);
-    pad1_mid->SetTopMargin(0.02);    pad1_mid->SetBottomMargin(0.02);
+    pad1_top->SetRightMargin(0.05);  pad1_top->SetTopMargin(0.12);
+    pad1_mid->SetTopMargin(0.05);    pad1_mid->SetBottomMargin(0.02);
     pad1_mid->SetLeftMargin(0.12);   pad1_mid->SetRightMargin(0.05);
     pad1_bot->SetTopMargin(0.02);    pad1_bot->SetBottomMargin(0.28);
     pad1_bot->SetLeftMargin(0.12);   pad1_bot->SetRightMargin(0.05);
@@ -434,7 +434,7 @@ void rlc_analysis() {
     pad1_top->Draw(); pad1_mid->Draw(); pad1_bot->Draw();
 
     pad1_top->cd();
-    gr_plus->SetTitle("");
+    gr_plus->SetTitle("Fit della linearizzazione dei dati (separati)");
     gr_plus->GetXaxis()->SetLimits(xmin, xmax);
     gr_plus->GetYaxis()->SetRangeUser(ymin, ymax);
     gr_plus->GetXaxis()->SetTitle("n");
@@ -512,14 +512,14 @@ void rlc_analysis() {
     TPad *pad2_bot = new TPad("pad2_bot", "pad2_bot", 0.0, 0.00, 1.0, 0.28);
 
     pad2_top->SetBottomMargin(0.02); pad2_top->SetLeftMargin(0.12);
-    pad2_top->SetRightMargin(0.05);  pad2_top->SetTopMargin(0.05);
-    pad2_bot->SetTopMargin(0.02);    pad2_bot->SetBottomMargin(0.25);
+    pad2_top->SetRightMargin(0.05);  pad2_top->SetTopMargin(0.12);
+    pad2_bot->SetTopMargin(0.12);    pad2_bot->SetBottomMargin(0.25);
     pad2_bot->SetLeftMargin(0.12);   pad2_bot->SetRightMargin(0.05);
 
     pad2_top->Draw(); pad2_bot->Draw();
 
     pad2_top->cd();
-    gr_all->SetTitle("");
+    gr_all->SetTitle("Fit della linearizzazione dei dati (combinato)");
     gr_all->GetXaxis()->SetLimits(xmin, xmax);
     gr_all->GetYaxis()->SetRangeUser(ymin, ymax);
     gr_all->GetXaxis()->SetTitle("n");
