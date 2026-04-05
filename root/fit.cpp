@@ -22,6 +22,19 @@
 #include <numeric>
 #include <algorithm>
 
+// Helper per formattare valore +/- errore con 1 cifra significativa sull'errore
+std::string FormatParam(double val, double err) {
+    if (err <= 0) return Form("%.4f", val);
+    int exponent = (int)std::floor(std::log10(err));
+    double factor = std::pow(10, exponent);
+    double err_rounded = std::round(err / factor) * factor;
+    // Arrotonda il valore allo stesso numero di decimali
+    int dec = -exponent;
+    if (dec < 0) dec = 0;
+    std::string fmt = Form("%%.%df #pm %%.%df", dec, dec);
+    return Form(fmt.c_str(), val, err_rounded);
+}
+
 void rlc_analysis() {
 
     // ============================================================
@@ -357,6 +370,7 @@ void rlc_analysis() {
     for (int i = 0; i < Ntot; i++) maxAbsRes_comb = std::max(maxAbsRes_comb, std::abs(res_all_comb[i]));
     double resY_comb = 2 * std::max(0.15, 1.35 * maxAbsRes_comb);
 
+    
     // --------------------------------------------------------
     // 6. Stampa risultati
     // --------------------------------------------------------
@@ -433,20 +447,28 @@ void rlc_analysis() {
     f_plus->Draw("SAME");
     f_minus->Draw("SAME");
 
+    TGraph *gr_temp_plus = new TGraph(Np, n_plus.data(), lnVp.data());
+    double r_plus = gr_temp_plus->GetCorrelationFactor();
+    delete gr_temp_plus;
+
     TPaveText *ptB = new TPaveText(bB_x1, bB_y1, bB_x2, bB_y2, "NDC");
     ptB->SetFillColor(kWhite); ptB->SetBorderSize(1);
     ptB->SetTextAlign(12); ptB->SetTextSize(bB_textsize); ptB->SetTextColor(kBlue);
     ptB->AddText(Form("#chi^{2} / ndf      %.4f / %d", chi2p, (int)ndfp));
-    ptB->AddText(Form("Prob              %.4f", TMath::Prob(chi2p, ndfp)));
+    ptB->AddText(Form("r = %.6f", r_plus));   
     ptB->AddText(Form("p0      %.4f #pm %.5f", p0p, s_p0p));
     ptB->AddText(Form("p1      %.4f #pm %.5f", p1p, s_p1p));
     ptB->Draw();
+
+    TGraph *gr_temp_minus = new TGraph(Nm, n_minus.data(), lnVm.data());
+    double r_minus = gr_temp_minus->GetCorrelationFactor();
+    delete gr_temp_minus;
 
     TPaveText *ptR = new TPaveText(bR_x1, bR_y1, bR_x2, bR_y2, "NDC");
     ptR->SetFillColor(kWhite); ptR->SetBorderSize(1);
     ptR->SetTextAlign(12); ptR->SetTextSize(bR_textsize); ptR->SetTextColor(kRed);
     ptR->AddText(Form("#chi^{2} / ndf      %.4f / %d", chi2m, (int)ndfm));
-    ptR->AddText(Form("Prob              %.4f", TMath::Prob(chi2m, ndfm)));
+    ptR->AddText(Form("r = %.6f", r_minus));   // <-- SOSTITUITO Prob
     ptR->AddText(Form("p0      %.4f #pm %.5f", p0m, s_p0m));
     ptR->AddText(Form("p1      %.4f #pm %.5f", p1m, s_p1m));
     ptR->Draw();
@@ -508,11 +530,16 @@ void rlc_analysis() {
     gr_all->Draw("AP");
     f_all->Draw("SAME");
 
+    // Calcola r per il fit combinato
+    TGraph *gr_temp_all = new TGraph(Ntot, n_all.data(), lnV_all.data());
+    double r_all = gr_temp_all->GetCorrelationFactor();
+    delete gr_temp_all;
+
     TPaveText *ptC = new TPaveText(bC_x1, bC_y1, bC_x2, bC_y2, "NDC");
     ptC->SetFillColor(kWhite); ptC->SetBorderSize(1);
     ptC->SetTextAlign(12); ptC->SetTextSize(bC_textsize); ptC->SetTextColor(kBlack);
     ptC->AddText(Form("#chi^{2} / ndf      %.4f / %d", chi2c, (int)ndfc));
-    ptC->AddText(Form("Prob              %.4f", TMath::Prob(chi2c, ndfc)));
+    ptC->AddText(Form("r = %.6f", r_all));   // <-- SOSTITUITO Prob
     ptC->AddText(Form("p0      %.4f #pm %.5f", p0c, s_p0c));
     ptC->AddText(Form("p1      %.4f #pm %.5f", p1c, s_p1c));
     ptC->Draw();

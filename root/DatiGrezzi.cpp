@@ -395,7 +395,7 @@ void rlc_waveform() {
     int N_wave = (int)t_raw.size();
     std::vector<double> t_wave(N_wave), V_wave(N_wave);
     for (int i = 0; i < N_wave; i++) {
-        t_wave[i] = (double)t_raw[i];  // us  (raw vale gia' in us: 20000 raw = 20000 us = 0.02 s)
+        t_wave[i] = (double)t_raw[i] * 1e-6;  // us  (raw vale gia' in us: 20000 raw = 20000 us = 0.02 s)
         V_wave[i] = V_raw[i] * 1e-6;   // V (raw * 1e-6)
     }
 
@@ -421,21 +421,21 @@ void rlc_waveform() {
     // -- Massimi (blu, cerchio aperto) --
     // n = 1, 2, 3, 4, 5
     // Tempi stimati dalla curva: primo picco ~0.16 s, poi ogni ~T=7.6 s
-    std::vector<double> t_max = {160000, 7480000, 15100000, 22780000, 29960000};
+    std::vector<double> t_max = {1.60000, 7.48000, 15.10000, 22.78000, 29.96000};
     std::vector<double> V_max = {2.26-0.02, 1.06-0.02, 0.48-0.02, 0.22-0.02, 0.10-0.02};
 
     // -- Minimi (rosso, cerchio pieno) --
     // n = 1.5, 2.5, 3.5, 4.5
     // Valori negativi coerenti con la curva; |V| corretti per offset
-    std::vector<double> t_min = {3650000, 11220000, 18880000, 26380000};
+    std::vector<double> t_min = {3.65000, 11.22000, 18.88000, 26.38000};
     std::vector<double> V_min = {-(1.56+0.02), -(0.66+0.02), -(0.28+0.02), -(0.10+0.02)};
 
     // -- Zeri crescenti t^+ (verde) --
-    std::vector<double> t_zup  = {5600000, 13200000, 20800000, 28320000};
+    std::vector<double> t_zup  = {5.60000, 13.20000, 20.80000, 28.32000};
     std::vector<double> V_zup(t_zup.size(), 0.0);
 
     // -- Zeri decrescenti t^- (magenta) --
-    std::vector<double> t_zdown = {1800000, 9400000, 17000000, 24600000, 32200000};
+    std::vector<double> t_zdown = {1.80000, 9.40000, 17.00000, 24.60000, 32.20000};
     std::vector<double> V_zdown(t_zdown.size(), 0.0);
 
     // --------------------------------------------------------
@@ -486,7 +486,7 @@ void rlc_waveform() {
 
     gr_wave->SetTitle("");
     gr_wave->GetXaxis()->SetTitle("t  (#mus)");
-    gr_wave->GetYaxis()->SetTitle("Voltaggio (V)");
+    gr_wave->GetYaxis()->SetTitle("Voltaggio [V]");
     gr_wave->GetXaxis()->SetTitleSize(0.052);
     gr_wave->GetYaxis()->SetTitleSize(0.052);
     gr_wave->GetXaxis()->SetLabelSize(0.042);
@@ -498,7 +498,7 @@ void rlc_waveform() {
 
     // Linea tratteggiata a V = 0
     // Linea zero estesa a tutto il range degli assi (non si ferma con i dati)
-    double x_axis_max = 35e6;  // us (= 35 s)
+    double x_axis_max = 35;  // us (= 35 s)
     gr_wave->GetXaxis()->SetLimits(0.0, x_axis_max);
     TLine *line0 = new TLine(0.0, 0.0, x_axis_max, 0.0);
     line0->SetLineStyle(2);
