@@ -55,8 +55,8 @@ const double VL0_INIT  = 2.3;    // V   (fisso: il primo punto dà già una buon
 const double VOFF_INIT = 0.0;    // V   (fisso: offset atteso nullo)
 
 // --- Box risultati fit (coordinate NDC del pad superiore) ---
-const double BOX_x1 = 0.13, BOX_y1 = 0.58, BOX_x2 = 0.52, BOX_y2 = 0.88;
-const double BOX_textsize = 0.027;
+const double BOX_x1 = 0.13, BOX_y1 = 0.52, BOX_x2 = 0.51, BOX_y2 = 0.88;
+const double BOX_textsize = 0.035;
 
 // --- Scala asse Y dei residui ---
 const double RES_YMAX = 0.075;   // V
