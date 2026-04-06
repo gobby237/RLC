@@ -36,7 +36,7 @@
 
 // --- Range temporale del fit ---
 const double T_FIT_MIN = 0.0;    // s
-const double T_FIT_MAX = 35e-6;  // s
+const double T_FIT_MAX = 46.78e-6;  // s
 
 // --- Incertezza sui dati ---
 const double SIGMA_V = 0.02;     // V  (20 mV, stima conservativa)
@@ -826,9 +826,9 @@ void rlc_fit() {
     TPad *pad_bot = new TPad("pad_bot", "", 0.0, 0.00, 1.0, 0.30);
 
     pad_top->SetBottomMargin(0.02);  pad_top->SetLeftMargin(0.11);
-    pad_top->SetRightMargin(0.04);   pad_top->SetTopMargin(0.07);
+    pad_top->SetRightMargin(0.07);   pad_top->SetTopMargin(0.1);
     pad_bot->SetTopMargin(0.02);     pad_bot->SetBottomMargin(0.28);
-    pad_bot->SetLeftMargin(0.11);    pad_bot->SetRightMargin(0.04);
+    pad_bot->SetLeftMargin(0.11);    pad_bot->SetRightMargin(0.07);
 
     pad_top->Draw();
     pad_bot->Draw();
@@ -865,7 +865,7 @@ void rlc_fit() {
     pt->AddText(Form("V_{off} = %s", s_Voff.Data()));
     pt->Draw();
 
-    TLegend *leg = new TLegend(0.67, 0.80, 0.94, 0.91);
+    TLegend *leg = new TLegend(0.80, 0.80, 1, 0.91);
     leg->SetBorderSize(1);  leg->SetFillColor(kWhite);  leg->SetTextSize(0.036);
     leg->AddEntry(gr, "Dati sperimentali",  "p");
     leg->AddEntry(f,  "Fit multiparametrico", "l");
