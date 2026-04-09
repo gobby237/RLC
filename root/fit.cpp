@@ -35,12 +35,12 @@ std::string FormatParam(double val, double err) {
     return Form(fmt.c_str(), val, err_rounded);
 }
 
-void rlc_analysis() {
+void fit() {
 
     // ============================================================
     //  PARAMETRO DA MODIFICARE: offset del ground in milliVolt
     // ============================================================
-    double offset_mV = 20.0;   // <--- MODIFICA QUI (in milliVolt)
+    double offset_mV = 17.0;   // <--- MODIFICA QUI (in milliVolt)
     double offset_V  = offset_mV * 1e-3;
 
     // ============================================================
@@ -75,13 +75,15 @@ void rlc_analysis() {
 
     // --- Massimi (n+, V+) ---
     std::vector<double> n_plus   = {1.0, 2.0, 3.0, 4.0, 5.0};
-    std::vector<double> V_plus   = {2.26, 1.06, 0.48, 0.22, 0.10};
+    // std::vector<double> V_plus   = {2.26, 1.06, 0.48, 0.22, 0.10};
     std::vector<double> sV_plus  = {0.04, 0.03, 0.02, 0.02, 0.02};
+    std::vector<double> V_plus   = {2.4, 1.06, 0.48, 0.22, 0.10};
 
     // --- Minimi (n-, |V-| gia' in valore assoluto come misurati) ---
     std::vector<double> n_minus  = {1.5, 2.5, 3.5, 4.5, 5.5};
-    std::vector<double> V_minus  = {1.56, 0.66, 0.28, 0.10, 0.04};
+    // std::vector<double> V_minus  = {1.56, 0.66, 0.28, 0.10, 0.04};
     std::vector<double> sV_minus = {0.03, 0.02, 0.02, 0.02, 0.02};
+    std::vector<double> V_minus  = {1.56, 0.66, 0.28, 0.12, 0.04};
 
     // --------------------------------------------------------
     // 1b. Applica correzione offset ground

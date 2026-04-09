@@ -131,7 +131,7 @@ TString fmtSci(double val, double err, const char* unit) {
 //  SEZIONE 4: FUNZIONE PRINCIPALE
 // ============================================================
 
-void rlc_fit() {
+void fitCompleto() {
 
     gStyle->SetOptStat(0);
     gStyle->SetOptFit(0);
