@@ -388,7 +388,7 @@ print(f"    {PAR_NAMES[PARAM_Y]}: [{yc_min:.4g}, {yc_max:.4g}]  sigma={0.5*(yc_m
 
 plt.style.use(hep.style.ROOT)
 plt.rcParams.update({
-    'text.usetex': True,
+    'text.usetex': False,
     'axes.formatter.min_exponent': 2,
     'figure.constrained_layout.use': True,
 })
@@ -429,10 +429,15 @@ fig, ax = plt.subplots(
     sharey='row',
     constrained_layout=True
 )
+# --- CORREZIONE TITOLO ---
+label_x_clean = PAR_LABELS[PARAM_X].replace('$', '')
+label_y_clean = PAR_LABELS[PARAM_Y].replace('$', '')
+
 fig.suptitle(
-    rf'$\chi^2\left({PAR_LABELS[PARAM_X]},\, {PAR_LABELS[PARAM_Y]}\right)$',
+    rf'$\chi^2 \left( {label_x_clean},\, {label_y_clean} \right)$',
     fontsize=13
 )
+# -------------------------
 
 # ---- Mappa 2D  (ax[0,1]) ----
 level_cont = np.linspace(chi2_min_map, chi2_min_map + CHI2_DISPLAY_DELTA, 200)
