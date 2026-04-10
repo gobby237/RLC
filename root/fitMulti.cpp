@@ -352,21 +352,18 @@ void fitMulti() {
     printf("  R = %s\n\n", sR_str.Data());
 
     // ----------------------------------------------------------
-    // 4.10  Residui normalizzati  (V_i - f(t_i)) / sigma_i
+    // 4.10  Residui veri (non normalizzati)  V_i - f(t_i)
     // ----------------------------------------------------------
-    std::vector<double> res_norm(N);
+    std::vector<double> res_raw(N);
     for (int i = 0; i < N; i++)
-        res_norm[i] = (V_V[i] - f->Eval(t_s[i])) / sV[i];
+        res_raw[i] = V_V[i] - f->Eval(t_s[i]);
 
-    // Errori sui residui normalizzati = 1 per ogni punto
-    std::vector<double> ones(N, 1.0);
-
-    TGraphErrors *gr_res = new TGraphErrors(N, t_s.data(), res_norm.data(), nullptr, ones.data());
+    // Crea un TGraph semplice (senza barre di errore) per i residui
+    TGraph *gr_res = new TGraph(N, t_s.data(), res_raw.data());
     gr_res->SetMarkerStyle(20);
     gr_res->SetMarkerColor(kBlack);
     gr_res->SetMarkerSize(0.3);
     gr_res->SetLineColor(kBlack);
-
     // ----------------------------------------------------------
     // 4.11  Canvas e pad
     // ----------------------------------------------------------
@@ -377,7 +374,7 @@ void fitMulti() {
 
     pad_top->SetBottomMargin(0.02);  pad_top->SetLeftMargin(0.11);
     pad_top->SetRightMargin(0.12);   pad_top->SetTopMargin(0.10);
-    pad_bot->SetTopMargin(0.02);     pad_bot->SetBottomMargin(0.28);
+    pad_bot->SetTopMargin(0.02);     pad_bot->SetBottomMargin(0.35);
     pad_bot->SetLeftMargin(0.11);    pad_bot->SetRightMargin(0.12);
 
     pad_top->Draw();
@@ -422,28 +419,35 @@ void fitMulti() {
     leg->AddEntry(f,  "Fit pesato",        "l");
     leg->Draw();
 
-    // --- Pad inferiore: residui normalizzati (pull) ---
+    // --- Pad inferiore: residui veri (non normalizzati) ---
     pad_bot->cd();
+
+    // Calcola automaticamente il range Y con un margine del 20%
+    double res_min = *std::min_element(res_raw.begin(), res_raw.end());
+    double res_max = *std::max_element(res_raw.begin(), res_raw.end());
+    double margin = 0.2 * (res_max - res_min);
+    if (margin == 0) margin = 0.1;  // caso tutti residui uguali
 
     gr_res->SetTitle("");
     gr_res->GetXaxis()->SetLimits(T_FIT_MIN, T_FIT_MAX);
-    gr_res->GetYaxis()->SetRangeUser(-RES_YMAX, RES_YMAX);
+    gr_res->GetYaxis()->SetRangeUser(res_min - margin, res_max + margin);
     gr_res->GetXaxis()->SetTitle("Tempi [s]");
-    gr_res->GetYaxis()->SetTitle("Residui norm. [#sigma]");
-    gr_res->GetXaxis()->SetTitleSize(0.12);  gr_res->GetYaxis()->SetTitleSize(0.10);
-    gr_res->GetXaxis()->SetLabelSize(0.09);  gr_res->GetYaxis()->SetLabelSize(0.085);
+    gr_res->GetYaxis()->SetTitle("Residui [V]");
+    gr_res->GetXaxis()->SetTitleSize(0.12);
+    gr_res->GetYaxis()->SetTitleSize(0.10);
+    gr_res->GetXaxis()->SetLabelSize(0.09);
+    gr_res->GetYaxis()->SetLabelSize(0.085);
     gr_res->GetXaxis()->SetTitleOffset(0.95);
     gr_res->GetYaxis()->SetTitleOffset(0.50);
     gr_res->GetYaxis()->SetNdivisions(505);
-    gr_res->Draw("AP");
+    gr_res->Draw("AP");   // "A" per assi, "P" per punti
 
-    // Linee a ±1σ e 0
-    TLine *lz2  = new TLine(T_FIT_MIN,  0.0, T_FIT_MAX,  0.0);
-    TLine *lp1  = new TLine(T_FIT_MIN,  1.0, T_FIT_MAX,  1.0);
-    TLine *lm1  = new TLine(T_FIT_MIN, -1.0, T_FIT_MAX, -1.0);
-    lz2->SetLineStyle(2); lz2->SetLineColor(kRed);     lz2->SetLineWidth(1); lz2->Draw("SAME");
-    lp1->SetLineStyle(3); lp1->SetLineColor(kGray+1);  lp1->SetLineWidth(1); lp1->Draw("SAME");
-    lm1->SetLineStyle(3); lm1->SetLineColor(kGray+1);  lm1->SetLineWidth(1); lm1->Draw("SAME");
+    // Linea orizzontale a zero (solo riferimento)
+    TLine *lz2 = new TLine(T_FIT_MIN, 0.0, T_FIT_MAX, 0.0);
+    lz2->SetLineStyle(2);
+    lz2->SetLineColor(kRed);
+    lz2->SetLineWidth(1);
+    lz2->Draw("SAME");
 
     c->Update();
 }
