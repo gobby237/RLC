@@ -40,7 +40,7 @@ void fit() {
     // ============================================================
     //  PARAMETRO DA MODIFICARE: offset del ground in milliVolt
     // ============================================================
-    double offset_mV = 17.0;   // <--- MODIFICA QUI (in milliVolt)
+    double offset_mV = 20.0;   // <--- MODIFICA QUI (in milliVolt)
     double offset_V  = offset_mV * 1e-3;
 
     // ============================================================
@@ -436,7 +436,7 @@ void fit() {
     pad1_top->Draw(); pad1_mid->Draw(); pad1_bot->Draw();
 
     pad1_top->cd();
-    gr_plus->SetTitle("Fit della linearizzazione dei dati (separati)");
+    gr_plus->SetTitle("Fit linearizzato (max/min separati)");
     gr_plus->GetXaxis()->SetLimits(xmin, xmax);
     gr_plus->GetYaxis()->SetRangeUser(ymin, ymax);
     gr_plus->GetXaxis()->SetTitle("n");
@@ -521,7 +521,7 @@ void fit() {
     pad2_top->Draw(); pad2_bot->Draw();
 
     pad2_top->cd();
-    gr_all->SetTitle("Fit della linearizzazione dei dati (combinato)");
+    gr_all->SetTitle("Fit linearizzato (combinato)");
     gr_all->GetXaxis()->SetLimits(xmin, xmax);
     gr_all->GetYaxis()->SetRangeUser(ymin, ymax);
     gr_all->GetXaxis()->SetTitle("n");
