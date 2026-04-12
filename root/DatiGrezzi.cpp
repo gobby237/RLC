@@ -1,13 +1,11 @@
 // ============================================================
 //  RLC Oscillazioni Smorzate – Visualizzazione curva completa
 //  Curva V(t) con sovrapposti:
-//    - Massimi V_n^+  (blu, cerchio aperto)  -- coerente con rlc_analysis
-//    - Minimi  V_n^-  (rosso, cerchio pieno) -- coerente con rlc_analysis
+//    - Massimi V_n^+  (blu, cerchio aperto)
+//    - Minimi  V_n^-  (rosso, cerchio pieno)
 //    - Zeri crescenti  t^+  (verde, triangolo su)
 //    - Zeri decrescenti t^- (magenta, triangolo giu')
-//
-//  Dati caricati dal file dati.txt (1690 punti, t in [0.20, 33.98] s)
-//  Eliminati: transitorio iniziale (t < 0.20 s) con picco anomalo a 2.88 V
+//  Aggiunte etichette numeriche (1..5 per massimi, 1.5..5.5 per minimi)
 // ============================================================
 
 #include <TMath.h>
@@ -17,6 +15,7 @@
 #include <TLegend.h>
 #include <TStyle.h>
 #include <TLine.h>
+#include <TLatex.h>
 #include <iostream>
 #include <vector>
 
@@ -34,11 +33,8 @@ void DatiGrezzi() {
 
     // --------------------------------------------------------
     // 1. Dati completi della curva (t >= 0, dal file dati.txt)
-    //    t: i valori raw sono gia' in microsecondi (20000 raw = 20000 us)
-//    V: moltiplicato per 1e-6 -> Volt
-//    Asse x del grafico: microsecondi
-    // --------------------------------------------------------
-     std::vector<double> t_raw = {
+
+         std::vector<double> t_raw = {
         0, 20000, 40000, 60000, 80000, 100000, 120000, 140000, 160000, 180000,
         200000, 220000, 240000, 260000, 280000, 300000, 320000, 340000, 360000, 380000,
         400000, 420000, 440000, 460000, 480000, 500000, 520000, 540000, 560000, 580000,
@@ -513,50 +509,30 @@ void DatiGrezzi() {
         40000, 20000
     };
 
-
     int N_wave = (int)t_raw.size();
     std::vector<double> t_wave(N_wave), V_wave(N_wave);
     for (int i = 0; i < N_wave; i++) {
-        t_wave[i] = (double)t_raw[i] * 1e-6;  // us  (raw vale gia' in us: 20000 raw = 20000 us = 0.02 s)
-        V_wave[i] = V_raw[i] * 1e-6;   // V (raw * 1e-6)
+        t_wave[i] = (double)t_raw[i] * 1e-6;  // us -> s
+        V_wave[i] = V_raw[i] * 1e-6;          // V
     }
 
     // --------------------------------------------------------
     // 2. Punti caratteristici misurati manualmente in laboratorio
-    //
-    //  Colori coerenti con rlc_analysis.C:
-    //    Massimi V_n^+  --> blu,    cerchio aperto (marker 24)
-    //    Minimi  V_n^-  --> rosso,  cerchio pieno  (marker 20)
-    //    Zero crescente --> verde,  triangolo su    (marker 22)
-    //    Zero decrescente -> magenta, triangolo giu' (marker 23)
-    //
-    //  Valori METRIX con correzione offset 20 mV:
-    //    V_plus_corr  = V_plus_mis  - 0.020 V
-    //    V_minus_corr = V_minus_mis + 0.020 V  (segno negativo gia' incluso)
-    //
-    //  Tempi: t^+ = {5.6, 13.2, 20.8, 28.32} s  (zero crescente)
-    //         t^- = {1.8, 9.4, 17.0, 24.6, 32.2} s (zero decrescente)
-    //  Nota: questi tempi sono assoluti rispetto all'inizio dell'acquisizione
-    //  (il transitorio iniziale occupa i primi ~0.14 s, il primo massimo e' a ~0.16 s)
     // --------------------------------------------------------
 
-    // -- Massimi (blu, cerchio aperto) --
-    // n = 1, 2, 3, 4, 5
-    // Tempi stimati dalla curva: primo picco ~0.16 s, poi ogni ~T=7.6 s
+    // Massimi (blu, cerchio aperto)
     std::vector<double> t_max = {0, 7.28000, 14.9, 22.52, 30.16};
     std::vector<double> V_max = {2.26, 1.06, 0.48, 0.22, 0.10};
 
-    // -- Minimi (rosso, cerchio pieno) --
-    // n = 1.5, 2.5, 3.5, 4.5
-    // Valori negativi coerenti con la curva; |V| corretti per offset
+    // Minimi (rosso, cerchio pieno)
     std::vector<double> t_min = {3.48, 11.14, 18.68, 26.20};
     std::vector<double> V_min = {-(1.56), -(0.66), -(0.28), -(0.10)};
 
-    // -- Zeri crescenti t^+ (verde) --
+    // Zeri crescenti t^+ (verde)
     std::vector<double> t_zup  = {5.44, 13.04, 20.64, 28.16000};
     std::vector<double> V_zup(t_zup.size(), 0.0);
 
-    // -- Zeri decrescenti t^- (magenta) --
+    // Zeri decrescenti t^- (magenta)
     std::vector<double> t_zdown = {1.640000, 9.24000, 16.840000, 24.440000, 32.04000};
     std::vector<double> V_zdown(t_zdown.size(), 0.0);
 
@@ -577,7 +553,7 @@ void DatiGrezzi() {
 
     // Minimi: rosso, cerchio pieno (marker 20)
     TGraph *gr_min = new TGraph((int)t_min.size(), t_min.data(), V_min.data());
-    gr_min->SetMarkerStyle(24);
+    gr_min->SetMarkerStyle(20);
     gr_min->SetMarkerColor(kRed);
     gr_min->SetMarkerSize(1.6);
     gr_min->SetLineWidth(0);
@@ -604,10 +580,10 @@ void DatiGrezzi() {
     c->SetLeftMargin(0.09);
     c->SetRightMargin(0.05);
     c->SetBottomMargin(0.13);
-    c->SetTopMargin(0.05);
+    c->SetTopMargin(0.1);
 
-    gr_wave->SetTitle("");
-    gr_wave->GetXaxis()->SetTitle("t  (#mus)");
+    gr_wave->SetTitle("Confronto dati V(t) da chiavetta vs punti presi in laboratorio");
+    gr_wave->GetXaxis()->SetTitle("t  [#mus]");
     gr_wave->GetYaxis()->SetTitle("Voltaggio [V]");
     gr_wave->GetXaxis()->SetTitleSize(0.052);
     gr_wave->GetYaxis()->SetTitleSize(0.052);
@@ -619,8 +595,7 @@ void DatiGrezzi() {
     gr_wave->Draw("AP");
 
     // Linea tratteggiata a V = 0
-    // Linea zero estesa a tutto il range degli assi (non si ferma con i dati)
-    double x_axis_max = 35;  // us (= 35 s)
+    double x_axis_max = 35;  // s
     gr_wave->GetXaxis()->SetLimits(0.0, x_axis_max);
     TLine *line0 = new TLine(0.0, 0.0, x_axis_max, 0.0);
     line0->SetLineStyle(2);
@@ -634,16 +609,42 @@ void DatiGrezzi() {
     gr_zdown->Draw("P SAME");
 
     // --------------------------------------------------------
-    // 5. Legenda
+    // 5. Etichette numeriche per massimi e minimi
+    // --------------------------------------------------------
+    TLatex *latex = new TLatex();
+    latex->SetTextSize(0.035);
+    latex->SetTextFont(42);
+
+    // Offset per ogni etichetta (modificabili a piacere)
+    // Per i massimi: spostamento in x e y (positivo = verso destra/alto)
+    std::vector<double> x_shift_max = {0.4, 0.4, 0.4, 0.4, 0.4};
+    std::vector<double> y_shift_max = {0.08, 0.08, 0.08, 0.08, 0.08};
+    // Per i minimi: spostamento in x e y (negativo a sinistra per evitare sovrapposizioni)
+    std::vector<double> x_shift_min = {-0.4, -0.4, -0.4, -0.4};
+    std::vector<double> y_shift_min = {-0.08, -0.08, -0.08, -0.08};
+
+    // Etichette per massimi (1,2,3,4,5)
+    for (size_t i = 0; i < t_max.size(); ++i) {
+        double x = t_max[i] + x_shift_max[i];
+        double y = V_max[i] + y_shift_max[i];
+        latex->DrawLatex(x, y, Form("%d", (int)(i+1)));
+    }
+
+    // Etichette per minimi (1.5,2.5,3.5,4.5)
+    for (size_t i = 0; i < t_min.size(); ++i) {
+        double x = t_min[i] + x_shift_min[i];
+        double y = V_min[i] + y_shift_min[i];
+        latex->DrawLatex(x, y, Form("%.1f", i+1.5));
+    }
+
+    // --------------------------------------------------------
+    // 6. Legenda
     // --------------------------------------------------------
     TLegend *leg = new TLegend(0.68, 0.55, 0.96, 0.93);
-
-    TGraph *gr_wave_legend = new TGraph();  // grafico fittizio per rappresentare la curva V(t) nella legenda
-
-    gr_wave_legend->SetMarkerStyle(20);   // cerchio pieno -- visibile in legenda
+    TGraph *gr_wave_legend = new TGraph();
+    gr_wave_legend->SetMarkerStyle(20);
     gr_wave_legend->SetMarkerColor(kBlack);
-    gr_wave_legend->SetMarkerSize(0.4);   // piccolo, coerente con come appare nel grafico
-
+    gr_wave_legend->SetMarkerSize(0.4);
     leg->SetBorderSize(1);
     leg->SetFillColor(kWhite);
     leg->SetTextSize(0.038);

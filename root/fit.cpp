@@ -449,6 +449,15 @@ void fit() {
     f_plus->Draw("SAME");
     f_minus->Draw("SAME");
 
+    // --- Legenda per massimi e minimi (separati) ---
+    TLegend *leg_sep = new TLegend(0.78, 0.78, 0.96, 0.92);   // coordinate NDC
+    leg_sep->SetBorderSize(1);
+    leg_sep->SetFillColor(kWhite);
+    leg_sep->SetTextSize(0.038);
+    leg_sep->AddEntry(gr_plus,  "Massimi V_{n}^{+} (fit lineare)", "lp");
+    leg_sep->AddEntry(gr_minus, "Minimi  V_{n}^{-} (fit lineare)", "lp");
+    leg_sep->Draw();
+
     TGraph *gr_temp_plus = new TGraph(Np, n_plus.data(), lnVp.data());
     double r_plus = gr_temp_plus->GetCorrelationFactor();
     delete gr_temp_plus;

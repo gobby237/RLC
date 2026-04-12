@@ -6,6 +6,8 @@ import mplhep as hep
 from cycler import cycler
 import matplotlib.colors as colors
 import multiprocessing.pool
+import matplotlib.ticker as ticker
+
 
 
 # settaggio globale grafici    
@@ -152,7 +154,7 @@ fig, ax = plt.subplots(1, 1, figsize=(5, 4),constrained_layout = True)
 ax.errorbar(tempo,Vout,yerr=eVout,xerr=etempo, fmt='o', label=r'$V_{out}$',ms=2)
 ax.legend(prop={'size': 10}, loc='best')
 ax.set_ylabel(r'Voltaggio (V)')
-ax.set_xlim(bottom=0)          # <-- aggiungi questa linea
+ax.set_xlim(0, max(tempo))     # imposta sia inferiore che superiore
 
 plt.savefig(file+'_1'+'.png',
             bbox_inches ="tight",
@@ -191,19 +193,51 @@ residuA = Vout - fitf(tempo, *popt)
 # Grafico di questa prima regressione che tiene conto degli shift nel tempo e nel voltaggio.
 
 x_fit = np.linspace(min(tempo), max(tempo), 1000) # genero i punti su cui calcolare la funzione ottenuta con la regressione (1000 pti)
+# serve per il fit dopo 
+tempo_us = tempo * 1e6
+etempo_us = etempo * 1e6
+x_fit_us = np.linspace(min(tempo_us), max(tempo_us), 1000)
 
-fig, ax = plt.subplots(2, 1, figsize=(5, 4),sharex=True, constrained_layout = True, height_ratios=[2, 1])
-ax[0].plot(x_fit, fitf(x_fit, *popt), label='Fit', linestyle='--', color='black')
-ax[0].plot(x_fit,fitf(x_fit,Ainit,Binit,Cinit,v0init,t0init), label='init guess', linestyle='dashed', color='green')
-ax[0].errorbar(tempo,Vout,yerr=eVout,xerr=etempo, fmt='o', label=r'$V_{out}$',ms=2,color='red')
-ax[0].legend(loc='upper left')
-ax[0].set_ylabel(r'Tensione ai capi di R (V)')
-#ax[0].set_xticks([20,30,40,50])
+fig, ax = plt.subplots(2, 1, figsize=(5, 4), sharex=True, constrained_layout=True, height_ratios=[2, 1])
+ax[0].set_title(r'Fit curva di scarica ai capi di L', fontsize=20)
 
-ax[1].errorbar(tempo,residuA,yerr=eVout, fmt='o', label=r'Residui$',ms=2,color='red')
-ax[1].set_ylabel(r'Residui (V)')
-ax[1].set_xlabel(r'tempo (s)',loc='center')
-ax[1].plot(tempo,np.zeros(len(tempo)))
+# La funzione fitf usa x_fit (in secondi), ma viene plottata contro x_fit_us
+ax[0].plot(x_fit_us, fitf(x_fit, *popt), label='Fit', linestyle='-', color='black', linewidth=2)
+errbar = ax[0].errorbar(tempo_us, Vout, yerr=eVout, xerr=etempo_us, 
+                        fmt='o', ms=0.005, color='red', 
+                        linestyle='none')   # esplicito per sicurezza# Aggiungi formula nella legenda
+# ... dopo il plot della curva di fit e dei dati
+
+# Legenda per fit e dati (in basso a destra)
+ax[0].legend([ax[0].lines[0], errbar],  # raccoglie la linea del fit e i punti errorbar
+             [r'Fit', r'$V_{L}$'],
+             loc='lower right', fontsize=13, frameon=True)
+
+# Aggiungi la formula in alto a destra (in coordinate assi, con x=0.95, y=0.95)
+formula = r'$V_{L}(t) = \frac{V_1}{\Omega} e^{-(t-t_0)/\tau} \left( \frac{1}{\tau}\sin[\Omega (t - t_0)] + \Omega \cos[\Omega (t - t_0)] \right) + v_{off}$'
+ax[0].text(0.98, 0.95, formula,
+           transform=ax[0].transAxes,
+           fontsize=15, verticalalignment='top', horizontalalignment='right',
+           bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+ax[0].set_ylabel(r'Tensione ai capi di L [V]', fontsize=16)
+ax[0].yaxis.labelpad = 14
+
+ax[0].tick_params(axis='both', labelsize=12)
+ax[1].tick_params(axis='both', labelsize=12)
+ax[1].errorbar(tempo_us, residuA, yerr=eVout, fmt='o', ms=0.005, color='red')
+ax[1].set_ylabel(r'Residui [V]', fontsize=16)
+ax[1].set_xlabel(r'Tempo [$\mu$s]', loc='center', fontsize=16)
+
+ax[0].set_xlim(0, max(tempo_us))
+
+# Disabilita la notazione scientifica sull'asse x
+ax[0].xaxis.set_major_formatter(plt.ScalarFormatter(useMathText=False))
+ax[1].xaxis.set_major_formatter(plt.ScalarFormatter(useMathText=False))
+ax[0].ticklabel_format(style='plain', axis='x')
+ax[1].ticklabel_format(style='plain', axis='x')
+
+ax[1].plot(tempo_us, np.zeros(len(tempo)), color='black', linewidth=1.2, linestyle='-')
+
 
 plt.savefig(file+'_2'+'.png',
             bbox_inches ="tight",
@@ -488,10 +522,19 @@ ax[1,1].set_yticks([int(chi2_min),int(chi2_min+4),int(chi2_min+8)])
 
 
 ax[1,0].set_axis_off()
-ax[0,0].set_ylabel(r'$\tau\left(s\right)$') 
-ax[1,1].set_xlabel(r'$\Omega\left(Hz\right)$',loc='center') 
+ax[0,0].set_ylabel(r'$\tau\left[s\right]$', fontsize=14) 
+ax[1,1].set_xlabel(r'$\Omega\left[rad/s\right]$', fontsize=14,loc='center') 
 ax[0,0].set_xlim(int(chi2_min-2),int(chi2_min+10)) 
 ax[1,1].set_ylim(int(chi2_min-2),int(chi2_min+10))
+
+# Formattazione pulita per Omega (notazione scientifica compatta)
+def format_omega(x, pos):
+    return f'{x:.1e}'.replace('e-0', 'e-')  # Rimuove lo zero superfluo nell'esponente
+
+for ax_omega in [ax[0,1], ax[1,1]]:
+    ax_omega.xaxis.set_major_formatter(ticker.FuncFormatter(format_omega))
+    ax_omega.xaxis.set_major_locator(plt.MaxNLocator(4))  # Massimo 4 tick
+    ax_omega.tick_params(axis='x', labelsize=8)  # Leggermente più piccolo
 
 plt.savefig(file+'_4'+'.png',
             bbox_inches ="tight",
@@ -508,7 +551,7 @@ plt.show()
 # Profilazione di V0 e Tau
 fig, ax = plt.subplots(2, 2, figsize=(5.5, 5),constrained_layout = True, height_ratios=[3, 1], width_ratios=[1,3], sharex='col', sharey='row')
 im = ax[0,1].contourf(A_chi,C_chi,Achi2D, levels=level, cmap=cmap)
-fig.suptitle(r'$\chi^2 \left(v_0, \tau \right)$')
+fig.suptitle(r'$\chi^2 \left(V_1, \tau \right)$')
 cbar = fig.colorbar(im, extend='both', shrink=0.9, ax=ax[0,1], ticks = [int(chi2_min),int(chi2_min+2),int(chi2_min+4),int(chi2_min+6)]) 
 cbar.set_label(r'$\chi^2$',rotation=360)
 
@@ -539,8 +582,8 @@ ax[1,1].text(A_chi[A_dx],int(chi2_min+4),r'{g:.2f}'.format(g=-1*errA), color='r'
 ax[1,1].set_yticks([int(chi2_min),int(chi2_min+4),int(chi2_min+8)])
 
 ax[1,0].set_axis_off()
-ax[0,0].set_ylabel(r'$\tau\left(s\right)$') 
-ax[1,1].set_xlabel(r'$v_0 \left(V\right)$') 
+ax[0,0].set_ylabel(r'$\tau\left[s\right]$', fontsize=14) 
+ax[1,1].set_xlabel(r'$V_1 \left[V\right]$', fontsize=14) 
 ax[0,0].set_xlim(int(chi2_min-2),int(chi2_min+10)) 
 ax[1,1].set_ylim(int(chi2_min-2),int(chi2_min+10))
 

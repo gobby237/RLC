@@ -1,0 +1,466 @@
+\documentclass[a4paper,12pt]{article}
+
+% Pacchetti utili
+\usepackage{tikz}
+\usepackage[utf8]{inputenc}
+\usepackage[italian]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{makecell}  
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage[parfill]{parskip}
+\usepackage{siunitx}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{subcaption}
+\usepackage{comment}
+\usepackage{siunitx}
+\sisetup{separate-uncertainty=true, table-format=...} % opzionale
+\usepackage{pgfplots}
+\usepackage{tikz}
+\pgfplotsset{compat=1.18}
+\usepackage{verbatim}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
+\usepackage{amsmath} % Per l'ambiente cases e \text
+\usepackage[utf8]{inputenc}
+\usepackage{rotating}
+\usepackage[hidelinks]{hyperref} % oppure senza hidelinks se vuoi i link colorati
+\usepackage{geometry}
+\usepackage{booktabs} % Per linee orizzontali professionali
+\usepackage{array}    % Per la gestione delle colonne
+\usepackage{enumitem}
+% Impostazioni di margine e intestazioni
+\geometry{a4paper, margin=1.5cm, tmargin=1cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\newsavebox{\leftimagebox}   % <-- NECESSARIO per il \savebox
+
+
+% Titolo e autori
+\title{ \textbf{Relazione circuito RLC }}
+
+\author{Giacomo Caneva, Thomas Gozzi, Antonio Gobbato}
+\date{15 Aprile 2026}
+
+\begin{document}
+\maketitle
+
+
+\vspace{-1cm}
+\noindent\rule{\textwidth}{0.5pt}
+
+\section{Obiettivo}
+
+Stima dei parametri necessari alla descrizione di un circuito RLC nel dominio del tempo. 
+
+\begin{comment}
+    
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|c|c|c|}
+        \hline
+        $R$ & $L$ & $C$ & $Q$ & $\tau$ & $\omega_d$ & $\omega_0$ & $V_0$\\ \hline
+    \end{tabular}
+\end{table}
+
+\end{comment}
+
+
+\section{Schema circuitale e dati grezzi}
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=1\linewidth]{Circuito.png}
+        \caption{Circuito RLC. Dove $C_C$ sono le capacità dei cavi, $R_G$ la resistenza del generatore, e $R_O$ e $C_O$ la resistenza e capacità dell'oscilloscopio. $R$, $L$ e $C$ sono le componenti del circuito.}
+    \label{fig:placeholder}
+\end{figure}
+
+\subsection{Rilievi sperimentali }
+Il grafico e la tabella mostrano i dati misurati con il cursore in laboratorio sovrapposti all'intera curva sperimentale.
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{ConfrontoDati.png}
+    \caption{Sovrapposizione tra la curva completa ed i dati presi con il cursore.}
+    \label{fig:placeholder}
+\end{figure}
+
+\begin{comment}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c||c|c|c|c|c|}
+        \hline
+        $n^+$ & $V_{n^+}$ (V) & $t_{max}$ ($\mu s$) & scala or. & scala vert. & $n^-$ & $V_{n^-}$ (V) & $t_{min}$ ($\mu s$) & scala or. & scala vert. \\ \hline
+        1 & 2.26 & 0  & 1 $\mu s $ & $0.5 V$ & 1.5 & -1.56 & 3.46  & 1 $\mu s $ & $0.5 V$ \\ \hline
+        2 & 1.06 & 7.26 & 1 $\mu s $ & $0.5 V$ & 2.5 & -0.66 & 11.12 & 1 $\mu s $ & $0.5 V$ \\ \hline
+        3 & 0.48 & 14.88 & 1 $\mu s $ & $0.5 V$ & 3.5 & -0.28 & 18.66 & 1 $\mu s $ & $0.5 V$ \\ \hline
+        4 & 0.22 & 22.50 & 1 $\mu s $ & $0.5 V$ & 4.5 & -0.10 & 26.28 & 1 $\mu s $ & $0.5 V$ \\ \hline
+        5 & 0.10 & 30.14 & 1 $\mu s $ & $0.5 V$ & 5.5 & -0.04 & 33.98 & 1 $\mu s $ & $0.5 V$ \\ \hline
+    \end{tabular}
+    \caption{Tabella con i dati puntuali presi in laboratorio relativi ai picchi dell'oscillazione smorzata}
+\end{table}
+
+
+\subsection{Zeri dell'esponenziale}
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c||c|c|c|}
+        \hline
+        $n^+$ & $t^+$ ($\mu s$) & scala or. & $n^-$ & $t^-$ ($\mu s$) & scala or. \\ \hline
+        1 & 0 & 1 $\mu s $ & 1.5 & 1.8 & 1 $\mu s $ \\ \hline
+        2 & 5.6 & 1 $\mu s $ & 2.5 & 9.4 & 1 $\mu s $ \\ \hline
+        3 & 13.2 & 1 $\mu s $ & 3.5 & 17.0 & 1 $\mu s $ \\ \hline
+        4 & 20.8 & 1 $\mu s $ & 4.5 & 24.6 & 1 $\mu s $ \\ \hline
+        5 & 28.32 & 1 $\mu s $ & 5.5 & 32.2 & 1 $\mu s $ \\ \hline
+    \end{tabular}
+    \caption{Tabella con i dati puntuali presi in laboratorio relativi agli zeri crescenti e decrescenti}
+\end{table}
+\end{comment}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c||c|c|c|c|c|}
+        \hline
+        $n^+$ & $V_{n^+}$ (V) & $t^+$ ($\mu s$) & scala or. & scala vert. & $n^-$ & $V_{n^-}$ (V) & $t^-$ ($\mu s$) & scala or. & scala vert. \\ \hline
+        1 & 2.26 & 0  & 1 $\mu s $ & $0.5 V$ & 1.5 & -1.56 & 1.8  & 1 $\mu s $ & $0.5 V$ \\ \hline
+        2 & 1.06 & 5.6 & 1 $\mu s $ & $0.5 V$ & 2.5 & -0.66 & 9.4 & 1 $\mu s $ & $0.5 V$ \\ \hline
+        3 & 0.48 & 13.2 & 1 $\mu s $ & $0.5 V$ & 3.5 & -0.28 & 17.0 & 1 $\mu s $ & $0.5 V$ \\ \hline
+        4 & 0.22 & 20.8 & 1 $\mu s $ & $0.5 V$ & 4.5 & -0.10 & 24.6 & 1 $\mu s $ & $0.5 V$ \\ \hline
+        5 & 0.10 & 28.3 & 1 $\mu s $ & $0.5 V$ & 5.5 & -0.04 & 32.2 & 1 $\mu s $ & $0.5 V$ \\ \hline
+    \end{tabular}
+    \caption{Tabella con i dati puntuali presi in laboratorio relativi ai picchi dell'oscillazione smorzata}
+\end{table}
+
+\section{Analisi dati}
+
+\begin{comment}
+\subsection{Stime a priori}
+Per stimare la resistenza totale del circuito, $R_{tot}$, si sommano in serie la resistenza dell'induttore $R_L$, la resistenza aggiunta del circuito $R$ e la resistenza del generatore $R_G$. Si ottiene così la seguente stima: 
+$$ R_{tot,priori} = () $$
+\end{comment}
+
+\subsection{Dati cursore}
+
+Si stima il periodo delle oscillazioni dividendo per 4 la differenza tra il tempo relativo all'ultimo zero decrescente e al primo, propagando le incertezze di lettura dei tempi: 
+
+$$T=t^{-}_{5.5}- t^+_{1.5}=(7.60\pm 0.01) \mu s $$
+
+Si può di conseguenza stimare la pulsazione delle oscillazioni come segue: 
+
+$$\Omega=\frac{2\pi}{T}= (8.27\pm0.02)\cdot10^{5}rad/s$$
+
+Al fine di migliorare l'accuratezza delle misure di tensione, è stato determinato un offset strumentale pari a $0.02 \, \text{V}$ analizzando la regione di baseline del segnale precedente all'innesco della scarica. Tale valore, agente come una componente sistematica sui dati è totalmente compatibile con l'errore di scala sulle tensioni (0.5V f.s.), si è deciso di correggere i dati grezzi riportati in tabella per la linearizzazione successiva.
+Di seguito si riporta il fit della linearizzazione della legge di scarica dei massimi e minimi di tensione  $\ln(V_n)=\ln(V_0)-n\delta T$, gli errori sulle tensioni sono state propagate sul logaritmo. 
+
+
+\begin{figure}[H]
+    \centering
+    % Misura l'altezza dell'immagine sinistra
+    \savebox{\leftimagebox}{%
+        \includegraphics[width=0.535\textwidth]{Fitmaxmin.png}%
+    }%
+    % Blocco sinistro
+    \begin{minipage}[b]{0.47\textwidth}
+        \centering
+        \usebox{\leftimagebox}
+        \par\small Figura 3: Fit max, min separati   % sostituito \subcaption
+    \end{minipage}%
+    \hfill
+    % Blocco destro forzato alla stessa altezza del sinistro
+    \begin{minipage}[b]{0.49\textwidth}
+        \centering
+        \vbox to \ht\leftimagebox{%
+            \vfill
+            \includegraphics[width=\linewidth, keepaspectratio]{Fitcombinato.png}
+            \vspace{1em}
+            \hspace{0.5cm}
+            \small
+            % Tabella MODIFICATA: tolte colonne V1 e sigma_V1, aggiunta colonna rho
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                & $m$ & $\sigma_m$ & $\ln(V_0)$ & $\sigma_{\ln(V_0)}$ & $\rho$ \\ \hline
+                Max   & -0.83 & 0.02 & 1.69 & 0.03 & 0.999 \\ \hline
+                Min    & -0.83 & 0.02 & 1.70 & 0.05 & 0.999 \\ \hline
+                Comb & -0.83 & 0.01 & 1.69 & 0.02 & 0.999 \\ \hline
+            \end{tabular}
+            \vfill
+        }
+        \par\small Figura 4: Fit combinato con tabella risultati  % sostituito \subcaption
+    \end{minipage}
+    
+    \label{fig:confronto}
+\end{figure}
+
+I valori relativi ai fit effettuati separatamente per i massimi  e i minimi della curva di smorzamento risultano compatibili entro incertezza sperimentale: $\lambda_m=0.13$ per le pendenze e $\lambda_{V_0}=0.11$ per le intercette. Essendo entrambi i $\lambda < 1$ è assicurata un'ottima compatibilità tra i due set di dati, si procede quindi considerando i risultati della regressione combinando tutti i valori in modulo. \\
+Dalla pendenza $m =(\delta T)$ si può ricavare $\tau = \frac{1}{\delta}$ usando il periodo $T$ già determinato. \\ Si procede anche con la stima della massima ampiezza di oscillazione $V_1$ come il valore assunto dalla tensione con ascissa $n = 1$. L'incertezza associata è stata ricavata dalla formula di propagazione degli errori tenendo conto della convarianza tra i parametri della regressione. 
+
+$$\tau_{lin}=\frac{T}{m}=(9.2\, \pm \,  0.2) \mathrm{\mu s}$$
+$$ V_1 = (2.38 \, \pm \, 0.03) \mathrm{V} $$
+
+
+
+Si calcolano a questo punto i rimanenti parametri del circuito, ottenuti tramite le formule riportate in appendice (dalla (16) alla (19)) e i cui risultati sono mostrati nelle tabelle (3) e (4) nelle conclusioni. Le incertezze per ciascuna delle stime si sono ottenute propagando gli errori casuali. 
+
+
+
+
+\subsection{Dati completi}
+
+Si presenta di seguito un fit multiparametrico effettuato sui dati che coprono un'intera curva di scarica ai capi dell'induttore. I parametri, le cui stime sono a seguito del grafico, sono: $V_1$, $\Omega$, $\tau$, $t_0$ e $v_{off}$. Gli ultimi due parametri servono per intercettare eventuali offset di sfasamento rispetto allo zero dei tempi ed il ground. 
+
+\begin{figure} [H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{FitMultiPatelli.png}
+    \caption{Fit multiparametrico della curva di scarica ai capi di L}
+    \label{fig:placeholder}
+\end{figure}
+
+
+
+
+
+
+
+
+
+
+\begin{comment}
+    Al fine di avere delle stime di tensioni più precise si è stimato un possibile offset dallo zero da togliere ai dati: mediando circa 150 punti precedenti al primo massimo di esponenziale smorzato si trova $V_{offset}=(0.017\pm0.001)V$
+\end{comment}
+
+\begin{itemize}
+    \item $V_1 = (2.424 \pm 0.004)\;\text{V}$ \quad ($0.17\%$)
+    \item $\Omega = (0.8337 \pm 0.002)\,\text{Mrad/s}$ \quad ($0.24\%$)
+    \item $\tau = (9.04 \pm 0.02)\;\mu\text{s}$ \quad ($0.22\%$)
+    \item $v_{\text{off}} = (21.7 \pm 0.4)\;\text{mV}$ \quad ($1.8\%$)
+    \item $t_0 = (-0.41 \pm 0.02)\;\mu\text{s}$ \quad ($4.9\%$)
+\end{itemize}
+
+La regressione dei dati mostra una compatibilità molto buona ($\chi^2/ndr = 0.1$) con i residui disposti in modo casuale quando la tensione è ancora significativa. Anche in questo caso sia $v_{off}$ che $t_0$ sono compatibili con i rispettivi errori di scala ($500\mathrm{mV}$ e $1\mu s$ f.s.) e sono contributi sistematici che possono essere corretti nei dati grezzi presi con la chiavetta. Si ricalcola quindi il fit con solo tre parametri. 
+
+\begin{itemize}
+    \item $V_1 = (2.424 \pm 0.004)\;\text{V}$ \quad ($0.17\%$)
+    \item $\Omega = (0.8337 \pm 0.001)\;\text{Mrad/s}$ \quad ($0.12\%$)
+    \item $\tau = (9.04 \pm 0.02)\;\mu\text{s}$ \quad ($0.22\%$)
+    \item $\chi^2 = 217$
+\end{itemize}
+
+Le stime sono quasi invariate, tranne una riduzione dell'incertezza associata alla frequenza di oscillazione. 
+Per visualizzare come sono state ricavate le incertezze associate ai dati si visualizzano di seguito le mappe del chi quadro, fissando due parametri e facendo variare il terzo. tagliando la curva a $\chi^2_{min} + 1$ e proittando sugli assi la curva chiusa così ottenuta si ottengono le incertezze associate ai singoli parametri.  
+
+
+\begin{figure} [H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{MappaChi2OmegaTau.png}
+        \caption{Prima configurazione}
+        \label{fig:mappa1}
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\linewidth]{MappaChi2V0Tau.png}
+        \caption{Seconda configurazione}
+        \label{fig:mappa2}
+    \end{subfigure}
+    \caption{Mappe di $\chi^2(\Omega, \tau)$ per diverse configurazioni}
+    \label{fig:mappe_chi2}
+\end{figure}
+
+\section{Conclusioni}
+
+
+Di seguito si espongono le stime dei parametri: prima determinate con l'utilizzo del Metrix, poi con i dati puntuali presi in laboratorio e infine quelli ottenuti scaricando l'intero set di dati.
+
+% --- TABELLA 1: COMPONENTI E QUALITÀ ---
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{8pt}          % Aumenta lo spazio orizzontale ai lati del testo (default 6pt)
+    \setlength{\extrarowheight}{3pt}     % Aggiunge 3pt di spazio sopra il testo di ogni riga
+    \begin{tabular}{|@{\hspace{2pt}}l@{\hspace{2pt}}|c|c|c|c|c|c|c|c|}
+        \hline
+        & $R_{tot}$ [$\Omega$] & $\sigma_{R_{tot}}$ [$\Omega$] & $L$ [$\mu$H] & $\sigma_L$ [$\mu$H]& $C$ [nF] & $\sigma_C$ [nF] & $Q$ & $\sigma_Q$ \\ \hline
+        \textbf{A Priori}   & 68.6 & 1.1 & 286 & 26 & 4.76 & 0.02 & 3.6  & 0.4  \\ \hline
+        \textbf{Da Lab}     & 65.8 & 1.1 & 302 & 2  & /    & /    & 3.83 & 0.06 \\ \hline
+        \textbf{Da Chiavetta} &    &     &     &    &      &      &      &      \\ \hline
+    \end{tabular}
+    \caption{Parametri dei componenti del circuito e fattore di merito $Q$.}
+    \label{tab:componenti}
+\end{table}
+
+\vspace{0cm} % Spazio tra le due tabelle
+
+\begin{table}[H]
+    \centering
+    \footnotesize
+    \setlength{\tabcolsep}{8pt}
+    \setlength{\extrarowheight}{3pt}
+    \begin{tabular}{|@{\hspace{2pt}}l@{\hspace{2pt}}|c|c|c|c|c|c|}
+        \hline
+        & $\tau$ [$\mu$s] & $\sigma_\tau$ [$\mu$s] & $\Omega$ [Mrad/s] & $\sigma_{\Omega}$ [Mrad/s] & $\omega_0$ [Mrad/s] & $\sigma_{\omega_0}$ [Mrad/s] \\ \hline
+        \textbf{A Priori}   & 8.3 & 0.9 &   &   &   &   \\ \hline
+        \textbf{Da Lab}     & 9.2 & 0.2 & 0.827 & 0.002 & 0.834 & 0.002 \\ \hline
+        \textbf{Da Chiavetta} &    &     &       &       &       &       \\ \hline
+    \end{tabular}
+    \caption{Parametri temporali, frequenze caratteristiche}
+    \label{tab:dinamica}
+\end{table}
+
+\section{Appendice}
+
+\subsection{Formule statistiche}
+\vspace{0.2cm}
+
+\begin{itemize}
+
+\item \textbf{Media aritmetica}
+\begin{equation}
+    \bar{x} = \frac{1}{N} \sum_{i=1}^{N} x_i
+\end{equation}
+
+\item \textbf{Deviazione standard della singola misura} 
+\begin{equation}
+    \sigma = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (x_i - \bar{x})^2}
+\end{equation} 
+    
+\item \textbf{Deviazione standard della media per misure statisticamente indipendenti}
+\begin{equation}
+    \sigma_{\bar{x}} = \frac{\sigma}{\sqrt{N}}
+\end{equation}
+
+\item \textbf{Compatibilità tra due stime}
+\begin{equation}
+    \lambda = \frac{|a - b|}{\sqrt{\sigma_a^2 + \sigma_b^2}}  
+\end{equation}
+
+
+    \item $\lambda < 1$: compatibilità ottima
+    \item $1 \leq \lambda < 2$: compatibilità buona
+    \item $2 \leq \lambda < 3$: compatibilità sufficiente
+    \item $\lambda \geq 3$: incompatibilità
+
+\item \textbf{Interpolazione lineare \( y = a + bx \) con:}
+\begin{itemize}
+    \item \( x_i \) statisticamente indipendenti tra loro, \( y_i \) statisticamente indipendenti tra loro;
+    \item \( \sigma_{x} \ll \sigma_{y} \);
+    \item \( \sigma_i \neq \sigma_y \).
+\end{itemize}
+
+\begin{equation}
+a = \frac{1}{\Delta} \left[ \left( \sum_{i} \frac{x_i^2}{\sigma_i^2} \right) \cdot \left( \sum_{i} \frac{y_i}{\sigma_i^2} \right) - \left( \sum_{i} \frac{x_i}{\sigma_i^2} \right) \cdot \left( \sum_{i} \frac{x_i y_i}{\sigma_i^2} \right) \right]
+\end{equation}
+
+\begin{equation}
+b = \frac{1}{\Delta} \left[ \left( \sum_{i} \frac{1}{\sigma_i^2} \right) \cdot \left( \sum_{i} \frac{x_i y_i}{\sigma_i^2} \right) - \left( \sum_{i} \frac{x_i}{\sigma_i^2} \right) \cdot \left( \sum_{i} \frac{y_i}{\sigma_i^2} \right) \right]
+\end{equation}
+
+\begin{equation}
+\begin{cases}
+\sigma_a^2 = \dfrac{1}{\Delta} \sum_{i} \dfrac{x_i^2}{\sigma_i^2}, \\
+\sigma_b^2 = \dfrac{1}{\Delta} \sum_{i} \dfrac{1}{\sigma_i^2}.
+\end{cases}
+\end{equation}
+
+\begin{equation}
+\Delta = \left( \sum_{i} \frac{1}{\sigma_i^2} \right) \cdot \left( \sum_{i} \frac{x_i^2}{\sigma_i^2} \right) - \left( \sum_{i} \frac{x_i}{\sigma_i^2} \right)^2
+\end{equation}
+
+\begin{equation}
+\sigma_{y,\text{post}} = \sqrt{\frac{\sum_{i=1}^N (y_i - a - bx_i)^2}{N - 2}}
+\end{equation}
+
+\vspace{0.2cm}
+
+\item \textbf{Somma in quadratura (contributi indipendenti)}
+\begin{equation}
+\sigma_{\text{tot}} = \sqrt{\sum_{k=1}^{m} \sigma_k^2}
+\end{equation}
+
+\item \textbf{Propagazione degli errori (forma generale)}
+Dato \(f=f(x_1,\dots,x_m)\), per incertezze piccole:
+\begin{equation}
+\sigma_f^2 \simeq \sum_{i=1}^{m}\left(\frac{\partial f}{\partial x_i}\right)^2\sigma_{x_i}^2
+\;+\;2\sum_{i<j}\left(\frac{\partial f}{\partial x_i}\right)\left(\frac{\partial f}{\partial x_j}\right)\mathrm{cov}(x_i,x_j).
+\end{equation}
+
+\item \textbf{Media pesata e incertezza (pesi \(w_i=1/\sigma_i^2\))}
+\begin{equation}
+\bar{x}_w=\frac{\sum_{i=1}^{N} w_i x_i}{\sum_{i=1}^{N} w_i},
+\qquad
+\sigma_{\bar{x}_w}=\left(\sum_{i=1}^{N} w_i\right)^{-1/2}.
+\end{equation}
+
+\item \textbf{Test di consistenza di \(N\) stime (chi-quadro su medie pesate)}
+Per stime \(x_i\) con incertezze \(\sigma_i\) e media pesata \(\bar{x}_w\):
+\begin{equation}
+\chi^2_{\text{tot}}=\sum_{i=1}^{N}\left(\frac{x_i-\bar{x}_w}{\sigma_i}\right)^2,
+\qquad
+\nu=N-1.
+\end{equation}
+
+\item \textbf{Massima verosimiglianza (MLE) con errori gaussiani indipendenti}
+Se \(y_i \sim \mathcal{N}(f(x_i;\boldsymbol{\theta}),\,\sigma_i^2)\) indipendenti:
+\begin{equation}
+\mathcal{L}(\boldsymbol{\theta})=\prod_{i=1}^{N}\frac{1}{\sqrt{2\pi}\sigma_i}\exp\!\left[-\frac{(y_i-f(x_i;\boldsymbol{\theta}))^2}{2\sigma_i^2}\right].
+\end{equation}
+Massimizzare \(\mathcal{L}\) equivale a minimizzare la \(\chi^2\):
+\begin{equation}
+-2\ln\mathcal{L}(\boldsymbol{\theta})=\chi^2(\boldsymbol{\theta})+\text{costante}.
+\end{equation}
+
+\item \textbf{Matrice di covarianza dei parametri (approssimazione lineare)}
+Indicando con \(J\) la jacobiana \(J_{i\mu}=\partial f(x_i;\boldsymbol{\theta})/\partial\theta_\mu\) e \(W=\mathrm{diag}(1/\sigma_i^2)\):
+\begin{equation}
+\mathrm{cov}(\boldsymbol{\theta}) \simeq (J^{T}WJ)^{-1}.
+\end{equation}
+
+\subsection{Formule fisiche}
+
+\item \textbf{Pulsazione di risonanza}
+\begin{equation}
+    \omega_0=\sqrt{\omega_d^2+\frac{1}{\tau^2}}
+\end{equation}
+
+\item \textbf{Fattore di merito}
+\begin{equation}
+    Q=\frac{\omega_0\tau}{2}
+\end{equation}
+
+\item \textbf{Induttanza del circuito}
+\begin{equation}
+    L=\frac{1}{\omega_0^2C}
+\end{equation}
+
+\item \textbf{Resistenza totale del circuito}
+\begin{equation}
+    R_{tot}=\frac{2L}{\tau}
+\end{equation}
+
+
+\end{itemize}
+
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
